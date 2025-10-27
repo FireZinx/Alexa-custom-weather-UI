@@ -1,0 +1,226 @@
+.main {
+    display: flex;
+    align-items: start;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    overflow: hidden;
+}
+
+.body{
+  display: flex;
+  height: 100%;
+  width: 100%;
+}
+
+.morning {
+    position: absolute;
+    background-image: url("../../public/Morning.png");
+    background-position: center center;
+    background-size: cover;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 2s;
+}
+
+.day {
+    position: absolute;
+    background-image: url("../../public/Day.png");
+    background-position: center center;
+    background-size: cover;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 2s;
+}
+
+.sunset {
+    position: absolute;
+    background-image: url("../../public/Sunset.png");
+    background-position: center center;
+    background-size: cover;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 2s;
+}
+
+.night {
+    position: absolute;
+    background-image: url("../../public/Night.png");
+    background-position: center center;
+    background-size: cover;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 2s;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    padding: 2rem;
+    width: 22.4rem;
+    height: 100%;
+    gap: 0.1rem;
+}
+
+.tempContainer {
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.gap {
+    width: 100%;
+    height: 1rem;
+}
+
+.mainTemp {
+    font-family: "Roboto";
+    font-size: 96px;
+    color: white;
+}
+
+.skyStatus {
+    font-family: "Geologica";
+    font-size: 32px;
+    color: white;
+}
+
+.tempInfo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 2rem;
+}
+
+.maxMin {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    gap: 0.5rem;
+}
+
+.humidityStatus {
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    width: 100%;
+    height: 100%;
+}
+
+.textFont {
+    font-family: "geologica";
+    font-size: 20px;
+    color: white;
+}
+
+.hoursFont {
+    font-family: "geologica";
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    font-weight: 350;
+    color: rgb(230, 230, 230);
+    width: 100%;
+    height: 2rem;
+}
+
+.forecastContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 14.9rem;
+    height: 9.2rem;
+    border-radius: 1rem;
+    background-color: rgba(32, 32, 32, 0.3);
+}
+
+.hoursContainer {
+    display: flex;
+    align-items: start;
+    justify-content: start;
+    width: 100%;
+}
+
+.lineSeparate {
+    background-color: rgba(255, 255, 255, 0.3);
+    width: 85%;
+    height: 2px;
+}
+
+.forecastIcons {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 3rem;
+    gap: 3.4rem;
+    width: 100%;
+}
+
+.forecastTemps {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 1.2rem;
+    width: 100%;
+    gap: 3.2rem;
+}
+
+.forecastFont {
+    font-family: "Inter";
+    font-weight: 500;
+    font-size: 20px;
+    color: rgb(243, 243, 243);
+}
+
+.timeContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+  padding: 2rem;
+  width: 25rem;
+  height: 100%;
+  gap: 0.1rem;
+}
+
+.timeNow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+}
+
+.hours {
+  display: flex;
+  padding-left: 0rem;
+  font-family: "Roboto";
+  align-items: start;
+  justify-content: start;
+  width: 100%;
+  font-size: 9rem;
+  font-weight: 750;
+  color: white;
+}
+
+.minutes {
+  display: flex;
+  font-family: "Roboto";
+  padding-right: 7.9rem;
+  align-items: end;
+  justify-content: end;
+  width: 100%;
+  height: 8rem;
+  font-size: 9rem;
+  font-weight: 350;
+  color: white;
+}
