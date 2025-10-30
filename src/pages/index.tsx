@@ -1,7 +1,5 @@
-import Image from "next/image";
 import styles from "@/styles/Home.module.css";
-import { useEffect, useRef } from "react";
-import { checkPrimeSync } from "crypto";
+import { useEffect, useRef, useState } from "react";
 
 export default function Home() {
   const axios = require('axios');
@@ -14,9 +12,29 @@ export default function Home() {
   const humidityRef = useRef(null);
   const thermalRef = useRef(null);
   const mainIcon = useRef(null);
-  const forecast1 = useRef(null);
-  const forecast2 = useRef(null);
-  const forecast3 = useRef(null);
+  const changeNews = useRef(null);
+  const activeNews = useRef(0);
+  const delay = useRef(1000);
+
+  const changeBackground = useRef(true);
+
+  let news = [
+    {ref: useRef(null), iconRef: useRef(null), tittleRef: useRef(null), arrowRef: useRef(null), id:"Ethereum", oldValue: 0, url: "https://api.binance.com/api/v3/ticker/price?symbol=ETHUSDT", method: "BINANCE_API", icon: "Ethereum.svg"},
+    {ref: useRef(null), iconRef: useRef(null), tittleRef: useRef(null), arrowRef: useRef(null), id:"Intel Copor.", oldValue: 0, url: "https://finance.yahoo.com/quote/INTC/", method: "YAHOO_API",className: "down2 yf-ipw1h0 base", icon: "Dell.svg"}
+  ]
+  
+  let forecastList = [
+    {time: useRef(null), temp: 0, condition: null},
+    {time: useRef(null), temp: 0, condition: null},
+    {time: useRef(null), temp: 0, condition: null}
+  ]
+  let conditions = [
+    "Garoa fraca", 
+    "Chuva fraca",
+    "Pancadas de chuva",
+    "Pancadas de chuva na região", 
+    "Chuva"
+  ]
 
   const hoursDiv = useRef(null);
   const minutesDiv = useRef(null);
@@ -31,19 +49,70 @@ export default function Home() {
   const nightImg = useRef(null);
 
   useEffect(() => {
-    const delay = setInterval(() => {
+    const interval = setInterval(() => {
       audio = document.querySelector("audio");
       if (audio) {
         audio.style.opacity = "0.01"; 
         console.log(audio)
-        clearInterval(delay);
+        clearInterval(interval);
       }
     }, 10000)
-    return () => {clearInterval(delay);}
   }, [])
 
+  const newsUpdate = useEffect(() => {
+    for (let x = 0; x < 2; x++) {
+      const interval = setInterval( async () => {
+        let value;
+
+        if (news[x].method == "BINANCE_API") {
+          const response = await fetch(news[x].url)
+          const data = await response.json();
+          value = parseFloat(data.price);
+         
+        } else {
+        const YahooFinance = require("yahoo-finance2").default
+        const yahooFinance = new YahooFinance();
+        //const results = await yahooFinance.search("Apple")
+        //const quote = await yahooFinance.quote("INTC");
+        //console.log("Intel current price:", quote.regularMarketPrice);
+        }
+
+        news[x].tittleRef.current.textContent = news[x].id
+        news[x].ref.current.textContent =  value;
+        news[x].iconRef.current.src = news[x].icon
+
+        if (value < news[x].oldValue) {
+          news[x].ref.current.style.color = "rgb(255, 0, 0)"
+          news[x].arrowRef.current.src = "Down.svg";
+          news[x].arrowRef.current.style.top = "1.6rem";
+
+        } else {
+          news[x].ref.current.style.color = "rgb(0, 255, 0)"
+          news[x].arrowRef.current.src = "Up.svg";
+          news[x].arrowRef.current.style.top = "1.4rem";
+        }
+        news[x].oldValue = value;
+      }, 2000 );
+    } 
+  }, [])
+
+  const newsSwap = useEffect(() => {
+    const interval = setInterval(() => {
+      changeNews.current.style.right = `${(activeNews.current * 16.7) - 7.4}rem`
+
+      console.log(changeNews.current.style.right)
+
+      activeNews.current++;
+
+      if (activeNews.current > 1) {
+        activeNews.current = 0
+      }
+    }, 4000)
+  });
+
+
   useEffect(() => {
-    const delay = setInterval(async () => {
+    const interval = setInterval(async () => {
       const { data } = await axios.get('https://weather.com/pt-BR/clima/hoje/l/8aba151d4d4c4def3207394a113181d59312d242ad3c12c88bdf347d2c4580f4');
       
       const $ = cheerio.load(data);
@@ -53,15 +122,14 @@ export default function Home() {
       const maxMinTempDiv = $(`div [data-testid="SegmentHighTemp"]`).eq(9).text().trim();
       const humidityDiv = $(`div [data-testid="wxData"]`).eq(2).text().trim();
       const thermalDiv = $(`.TodayDetailsCard--feelsLikeTempValue--8WgHV`).text();
-
       const sunTimeDiv = $(`.TwcSunChart--dateValue--TzXBr`).text();
       
+      const [high, low] = maxMinTempDiv.split("/");
+
       const timeSplit = sunTimeDiv.split(/(?<=\d{1,2}:\d{2})/);
 
       sunrise = timeSplit[0];
       sunset = timeSplit[1];
-
-      const [high, low] = maxMinTempDiv.split("/");
 
       mainTempRef.current.textContent = mainTempDiv;
       conditionsRef.current.textContent = conditionsDiv;
@@ -70,69 +138,62 @@ export default function Home() {
       humidityRef.current.textContent = humidityDiv;
       thermalRef.current.textContent = `Sensação térmica de ${thermalDiv}`;
 
-    }, (1000))
+    }, 30000)
 
-    return () => clearInterval(delay);
+    delay.current = 60000;
+    return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
-    const delay = setInterval(() => {
+    const interval = setInterval(() => {
       const now = new Date();
       const hours = now.getHours().toString().padStart(2, "0");
       const minutes = now.getMinutes().toString().padStart(2, "0");
-      
-      if (parseInt(hours) >= 22) {
-        forecast3.current.textContent = `${(parseInt(hours) - 23) + 3}:00 `
-      } else {
-        forecast3.current.textContent = `${parseInt(hours) + 3}:00`;
-      }
+      const hoursInt = parseInt(hours);
+      const minutesInt = parseInt(minutes);
 
-      if (parseInt(hours) >= 21) {
-        forecast2.current.textContent = `${(parseInt(hours) - 23) + 2}:00 `
-      }else {
-        forecast2.current.textContent = `${parseInt(hours) + 2}:00`;
-      }
-
-      if (parseInt(hours) >= 20) {
-        forecast1.current.textContent = `${(parseInt(hours) - 23) + 1}:00 `
-      }else {
-        forecast1.current.textContent = `${parseInt(hours) + 1}:00`;
+      for (let offset = 0; offset <= 2; offset++) {
+        if ((hoursInt + (offset + 1)) <= 23) {
+          forecastList[offset].time.current.textContent = `${hoursInt + (offset + 1)}:00`;
+        } else {
+          forecastList[offset].time.current.textContent = `${(hoursInt + (offset + 1)) - 24}:00`;
+        }
       }
 
       if (sunrise != null && sunset != null) { 
-        const [sunriseHours, sunriseMinutes] = sunrise.split(":")
-        const [sunsetHours, sunsetMinutes] = sunset.split(":")
+        const [sunriseHours, sunriseMinutes] = sunrise.split(":");
+        const [sunsetHours, sunsetMinutes] = sunset.split(":");
+        const conditionsReported = conditionsRef.current.textContent;
+        changeBackground.current = true;
 
-        if (parseInt(hours) >= parseInt(sunriseHours) && parseInt(hours) < sunsetHours) {
-          if (parseInt(minutes) >= parseInt(sunriseHours) && parseInt(minutes) < (Math.min(parseInt(sunriseMinutes) + 10, 60)) && parseInt(hours) == parseInt(sunriseHours)) {
-            morningImg.current.style.opacity = 1
-            nightImg.current.style.opacity = 0
-          } else if (parseInt(minutes) >= Math.min(parseInt(sunriseMinutes) + 10, 59) || parseInt(hours) >= parseInt(sunriseHours)  ) {
-            dayImg.current.style.opacity = 1
-            morningImg.current.style.opacity = 0
+        if (hoursInt >= parseInt(sunriseHours) && hoursInt < sunsetHours) {
+          for (let x = 0; x < conditions.length; x++) { 
+            if (conditionsReported == conditions[x]) {
+              dayImg.current.style.backgroundImage  = `url("Encoberto.jpg")`;
+              changeBackground.current = false;
+            }
           }
 
-          mainIcon
-        }
-
-        if (parseInt(hours) >= parseInt(sunsetHours) || parseInt(hours) < parseInt(sunriseHours)) {
-          if (parseInt(minutes) >= parseInt(sunsetHours) && parseInt(minutes) < (Math.min(parseInt(sunsetMinutes) + 10, 60)) && parseInt(hours) == parseInt(sunsetHours)) {
-            sunsetImg.current.style.opacity = 1
-            dayImg.current.style.opacity = 0
-          } else if (parseInt(minutes) >= Math.min(parseInt(sunsetMinutes) + 10, 59) || parseInt(hours) >= parseInt(sunsetHours)  ) {
-            nightImg.current.style.opacity = 1
-            sunsetImg.current.style.opacity = 0
+          if (changeBackground.current == true) {
+            dayImg.current.style.backgroundImage  = `url("${conditionsReported}.jpg")`;
           }
 
-          mainIcon.current.src = "Moon.svg"
+          dayImg.current.style.opacity = 1;
+          
+          mainIcon.current.src = "Sun.svg";
+        } else {
+          nightImg.current.style.opacity = 1;
+          dayImg.current.style.opacity = 0;
+          
+          mainIcon.current.src = "Moon.svg";
         }
       }
 
       hoursDiv.current.textContent = hours;
       minutesDiv.current.textContent = minutes;
-    }, 500);
+    }, 1000);
 
-    return () => clearInterval(delay);
+    return () => clearInterval(interval);
   }, []);
 
   return (
@@ -184,13 +245,13 @@ export default function Home() {
 
               <div className={styles.forecastContainer}>
                   <div className={styles.hoursContainer}>
-                      <div ref={forecast1} className={styles.hoursFont}>
+                      <div ref={forecastList[0].time} className={styles.hoursFont}>
                           15:00
                       </div>
-                      <div ref={forecast2} className={styles.hoursFont}>
+                      <div ref={forecastList[1].time} className={styles.hoursFont}>
                           16:00
                       </div>
-                      <div ref={forecast3} className={styles.hoursFont}>
+                      <div ref={forecastList[2].time} className={styles.hoursFont}>
                           17:00
                       </div>
                   </div>
@@ -221,6 +282,32 @@ export default function Home() {
               <div ref={hoursDiv} className={styles.hours}></div>
 
               <div ref={minutesDiv} className={styles.minutes}></div>
+            </div>
+          </div>
+          <div className={styles.infoCotainer}>
+            <div className={styles.newsCotainer}>
+              <div ref={changeNews} className={styles.newsList}>
+                <div className={styles.newsGap}>
+                  <img style={{width: "3rem", height: "3rem"}} ref={news[0].iconRef} ></img>
+                  <div style={{display: "flex", gap: "0.5rem"}}>
+                    <span>
+                      <div ref={news[0].tittleRef} className={styles.newsTittle}></div>
+                      <div ref={news[0].ref} className={styles.newsFont}></div>
+                    </span>
+                    <img ref={news[0].arrowRef} style={{width: "1.2rem", height: "1.2rem", position: "relative", top: "1.4rem"}} ></img>
+                  </div>
+                </div>
+                <div className={styles.newsGap}>
+                  <img style={{width: "3rem", height: "3rem"}} ref={news[1].iconRef} ></img>
+                  <div style={{display: "flex", gap: "0.5rem"}}>
+                    <span>
+                      <div ref={news[1].tittleRef} className={styles.newsTittle}></div>
+                      <div ref={news[1].ref} className={styles.newsFont}></div>
+                    </span>
+                    <img ref={news[1].arrowRef} style={{width: "1.2rem", height: "1.2rem", position: "relative", top: "1.4rem"}} ></img>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
