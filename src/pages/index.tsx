@@ -1,4 +1,5 @@
 import styles from "@/styles/Home.module.css";
+import { symlink } from "fs";
 import { useEffect, useRef, useState } from "react";
 
 export default function Home() {
@@ -19,8 +20,9 @@ export default function Home() {
   const changeBackground = useRef(true);
 
   let news = [
-    {ref: useRef(null), iconRef: useRef(null), tittleRef: useRef(null), arrowRef: useRef(null), id:"Ethereum", oldValue: 0, url: "https://api.binance.com/api/v3/ticker/price?symbol=ETHUSDT", method: "BINANCE_API", icon: "Ethereum.svg"},
-    {ref: useRef(null), iconRef: useRef(null), tittleRef: useRef(null), arrowRef: useRef(null), id:"Intel Copor.", oldValue: 0, url: "https://finance.yahoo.com/quote/INTC/", method: "YAHOO_API",className: "down2 yf-ipw1h0 base", icon: "Dell.svg"}
+    {ref: useRef(null), iconRef: useRef(null), tittleRef: useRef(null), arrowRef: useRef(null), id:"Ethereum", oldValue: 0, url: "https://api.binance.com/api/v3/ticker/price?symbol=ETHUSDT", icon: "Ethereum.svg"},
+    {ref: useRef(null), iconRef: useRef(null), tittleRef: useRef(null), arrowRef: useRef(null), id:"Litecoin", oldValue: 0, url: "https://api.binance.com/api/v3/ticker/price?symbol=LTCUSDT", icon: "Litecoin.svg"},
+    {ref: useRef(null), iconRef: useRef(null), tittleRef: useRef(null), arrowRef: useRef(null), id:"INTC", oldValue: 0, url: "/api/hello", icon: "Intel.svg"},
   ]
   
   let forecastList = [
@@ -60,22 +62,12 @@ export default function Home() {
   }, [])
 
   const newsUpdate = useEffect(() => {
-    for (let x = 0; x < 2; x++) {
+    for (let x = 0; x < news.length; x++) {
       const interval = setInterval( async () => {
         let value;
-
-        if (news[x].method == "BINANCE_API") {
-          const response = await fetch(news[x].url)
-          const data = await response.json();
-          value = parseFloat(data.price);
-         
-        } else {
-        const YahooFinance = require("yahoo-finance2").default
-        const yahooFinance = new YahooFinance();
-        //const results = await yahooFinance.search("Apple")
-        //const quote = await yahooFinance.quote("INTC");
-        //console.log("Intel current price:", quote.regularMarketPrice);
-        }
+        const response = await fetch(news[x].url)
+        const data = await response.json();
+        value = (Math.round(data.price * 100) / 100).toFixed(2);
 
         news[x].tittleRef.current.textContent = news[x].id
         news[x].ref.current.textContent =  value;
@@ -92,19 +84,19 @@ export default function Home() {
           news[x].arrowRef.current.style.top = "1.4rem";
         }
         news[x].oldValue = value;
-      }, 2000 );
+      }, 1500 );
     } 
   }, [])
 
   const newsSwap = useEffect(() => {
     const interval = setInterval(() => {
-      changeNews.current.style.right = `${(activeNews.current * 16.7) - 7.4}rem`
+      changeNews.current.style.right = `${activeNews.current * 16.4}rem`
 
       console.log(changeNews.current.style.right)
 
       activeNews.current++;
 
-      if (activeNews.current > 1) {
+      if (activeNews.current > (news.length - 1)) {
         activeNews.current = 0
       }
     }, 4000)
@@ -169,6 +161,9 @@ export default function Home() {
         if (hoursInt >= parseInt(sunriseHours) && hoursInt < sunsetHours) {
           for (let x = 0; x < conditions.length; x++) { 
             if (conditionsReported == conditions[x]) {
+              dayImg.current.style.backgroundImage  = `url("Chuva.jpg")`;
+              changeBackground.current = false;
+            } else if (conditionsReported == "Nublado") {
               dayImg.current.style.backgroundImage  = `url("Encoberto.jpg")`;
               changeBackground.current = false;
             }
@@ -176,7 +171,7 @@ export default function Home() {
 
           if (changeBackground.current == true) {
             dayImg.current.style.backgroundImage  = `url("${conditionsReported}.jpg")`;
-          }
+          } 
 
           dayImg.current.style.opacity = 1;
           
@@ -289,7 +284,7 @@ export default function Home() {
               <div ref={changeNews} className={styles.newsList}>
                 <div className={styles.newsGap}>
                   <img style={{width: "3rem", height: "3rem"}} ref={news[0].iconRef} ></img>
-                  <div style={{display: "flex", gap: "0.5rem"}}>
+                  <div className={styles.valueQuotesContainer}>
                     <span>
                       <div ref={news[0].tittleRef} className={styles.newsTittle}></div>
                       <div ref={news[0].ref} className={styles.newsFont}></div>
@@ -299,7 +294,7 @@ export default function Home() {
                 </div>
                 <div className={styles.newsGap}>
                   <img style={{width: "3rem", height: "3rem"}} ref={news[1].iconRef} ></img>
-                  <div style={{display: "flex", gap: "0.5rem"}}>
+                  <div className={styles.valueQuotesContainer}>
                     <span>
                       <div ref={news[1].tittleRef} className={styles.newsTittle}></div>
                       <div ref={news[1].ref} className={styles.newsFont}></div>
@@ -307,6 +302,24 @@ export default function Home() {
                     <img ref={news[1].arrowRef} style={{width: "1.2rem", height: "1.2rem", position: "relative", top: "1.4rem"}} ></img>
                   </div>
                 </div>
+                <div className={styles.newsGap}>
+                  <img style={{width: "3rem", height: "3rem"}} ref={news[2].iconRef} ></img>
+                  <div className={styles.valueQuotesContainer}>
+                    <span>
+                      <div ref={news[2].tittleRef} className={styles.newsTittle}></div>
+                      <div ref={news[2].ref} className={styles.newsFont}></div>
+                    </span>
+                    <img ref={news[2].arrowRef} style={{width: "1.2rem", height: "1.2rem", position: "relative", top: "1.4rem"}} ></img>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className={styles.moonContainer}>
+              <div className={styles.moonPhase}>
+
+              </div>
+              <div className={styles.moonFont}>
+
               </div>
             </div>
           </div>

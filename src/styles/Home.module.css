@@ -205,14 +205,17 @@
     padding-top: 2rem;
     padding-right: 1rem;
     display: flex;
+    flex-direction: column;
     width: 100%;
     height: 100%;
-    justify-content: center;
+    justify-content: start;
+    align-items: end;
+    gap: 1.5rem;
 }
 
 .newsCotainer {
     display: flex;
-    justify-content: center;
+    justify-content: start;
     align-items: center;
     overflow: hidden;
     left: 3.2rem;
@@ -225,8 +228,8 @@
 .newsList {
     display: flex;
     position: relative;
-    align-items: end;
-    justify-content: end;
+    align-items: start;
+    justify-content: start;
     padding: 0.55rem;
     gap: 5rem;
     transition: right 1s;
@@ -248,4 +251,18 @@
 .newsTittle {
     color: white;
     font-family: "geologica";
+}
+
+.valueQuotesContainer {
+    display: flex;
+    gap: 0.5rem;
+    width: 7.5rem;
+}
+
+.moonContainer {
+    display: flex;
+    width: 10rem;
+    height: 10rem;
+    border-radius: 2rem;
+    background-color: rgba(54, 54, 54, 0.507);
 }

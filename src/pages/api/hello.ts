@@ -1,13 +1,19 @@
-// Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
 
-type Data = {
-  name: string;
-};
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  const symbol = (req.query.symbol as string) || "INTC";
 
-export default function handler(
-  req: NextApiRequest,
-  res: NextApiResponse<Data>,
-) {
-  res.status(200).json({ name: "John Doe" });
+  try {
+    const YahooFinance = require("yahoo-finance2").default;
+    const yahooFinance = new YahooFinance({ suppressNotices: ['yahooSurvey'] });
+    const quote = await yahooFinance.quote(symbol);
+    res.status(200).json({
+      symbol,
+      price: quote.regularMarketPrice,
+      change: quote.regularMarketChange,
+      percent: quote.regularMarketChangePercent,
+    });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
 }
