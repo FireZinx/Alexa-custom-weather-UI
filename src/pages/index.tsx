@@ -43,7 +43,6 @@ export default function Home() {
 
   let sunrise = null;
   let sunset = null;
-  let audio;
 
   const morningImg = useRef(null);
   const dayImg = useRef(null);
@@ -52,7 +51,7 @@ export default function Home() {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      audio = document.querySelector("audio");
+      let audio = document.querySelector("audio");
       if (audio) {
         audio.style.opacity = "0.01"; 
         console.log(audio)
@@ -105,7 +104,7 @@ export default function Home() {
 
   useEffect(() => {
     const interval = setInterval(async () => {
-      const { data } = await axios.get('https://weather.com/pt-BR/clima/hoje/l/8aba151d4d4c4def3207394a113181d59312d242ad3c12c88bdf347d2c4580f4');
+      const { data } = await axios.get('https://weather.com/pt-BR/clima/hoje/l/8aba151d4d4c4def3207394a113181d59312d242ad3c12c88bdf347d2c4580f4'); 
       
       const $ = cheerio.load(data);
 
@@ -115,7 +114,7 @@ export default function Home() {
       const humidityDiv = $(`div [data-testid="wxData"]`).eq(2).text().trim();
       const thermalDiv = $(`.TodayDetailsCard--feelsLikeTempValue--8WgHV`).text();
       const sunTimeDiv = $(`.TwcSunChart--dateValue--TzXBr`).text();
-      
+
       const [high, low] = maxMinTempDiv.split("/");
 
       const timeSplit = sunTimeDiv.split(/(?<=\d{1,2}:\d{2})/);
@@ -130,11 +129,27 @@ export default function Home() {
       humidityRef.current.textContent = humidityDiv;
       thermalRef.current.textContent = `Sensação térmica de ${thermalDiv}`;
 
-    }, 30000)
+    }, 15000)
 
     delay.current = 60000;
     return () => clearInterval(interval);
   }, []);
+  
+
+  // const forecast = useEffect(() => {
+  //   setInterval(async () => {
+  //     const res = await axios.get(
+  //       "https://www.tempo.com/hoje/sao-bernardo-do-campo.htm"
+  //     );
+  //     const $ = cheerio.load(res);
+
+  //     const forecast = [
+  //       $(`.changeUnitT`).text(),
+  //     ]
+      
+  //     console.log(forecast[0])
+  //   }, 1000)
+  // }, []);
 
   useEffect(() => {
     const interval = setInterval(() => {
