@@ -178,16 +178,19 @@ export default function Home() {
             if (conditionsReported == conditions[x]) {
               dayImg.current.style.backgroundImage  = `url("Chuva.jpg")`;
               changeBackground.current = false;
-            } else if (conditionsReported == "Nublado") {
-              dayImg.current.style.backgroundImage  = `url("Encoberto.jpg")`;
-              changeBackground.current = false;
             }
           }
 
           if (changeBackground.current == true) {
             dayImg.current.style.backgroundImage  = `url("${conditionsReported}.jpg")`;
           } 
-
+          
+          if (conditionsReported == "Nublado") {
+            dayImg.current.style.backgroundImage  = `url("Encoberto.jpg")`;
+          } else if (conditionsReported == "Limpo com vento") {
+            dayImg.current.style.backgroundImage  = `url("Parcial. nublado.jpg")`;
+          }
+          
           dayImg.current.style.opacity = 1;
           
           mainIcon.current.src = "Sun.svg";
