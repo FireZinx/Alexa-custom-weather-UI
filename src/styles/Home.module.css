@@ -177,6 +177,17 @@
   height: 100%;
 }
 
+.dayInfo {
+    display: flex;
+    align-items: end;
+    height: 4rem;
+    font-size: 1.7rem;
+    font-family: "geologica";
+    color: white;
+    font-weight: 350;
+    letter-spacing: -0.025rem;
+}
+
 .hours {
   display: flex;
   font-family: "Roboto";
@@ -265,6 +276,7 @@
     display: flex;
     width: 10rem;
     height: 10rem;
-    border-radius: 2rem;
-    background-color: rgba(54, 54, 54, 0.507);
+    border-radius: 1.4rem;
+    background-color: rgba(54, 54, 54, 0.144);
+    backdrop-filter: blur(1rem);
 }

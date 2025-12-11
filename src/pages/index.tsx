@@ -30,6 +30,7 @@ export default function Home() {
     {time: useRef(null), temp: 0, condition: null},
     {time: useRef(null), temp: 0, condition: null}
   ]
+
   let conditions = [
     "Garoa fraca", 
     "Chuva fraca",
@@ -38,8 +39,34 @@ export default function Home() {
     "Chuva"
   ]
 
+  let weeks = [
+    "dom.",
+    "seg.",
+    "ter.",
+    "qua.",
+    "qui",
+    "sex.",
+    "sáb"
+  ]
+
+  let months = [
+    "janeiro",
+    "fevereiro",
+    "março",
+    "abril",
+    "maio",
+    "junho", 
+    "julho",
+    "agosto",
+    "setembro",
+    "outubro",
+    "novembro",
+    "dezembro"
+  ]
+
   const hoursDiv = useRef(null);
   const minutesDiv = useRef(null);
+  const dayRef = useRef(null);
 
   let sunrise = null;
   let sunset = null;
@@ -134,30 +161,20 @@ export default function Home() {
     delay.current = 60000;
     return () => clearInterval(interval);
   }, []);
-  
-
-  // const forecast = useEffect(() => {
-  //   setInterval(async () => {
-  //     const res = await axios.get(
-  //       "https://www.tempo.com/hoje/sao-bernardo-do-campo.htm"
-  //     );
-  //     const $ = cheerio.load(res);
-
-  //     const forecast = [
-  //       $(`.changeUnitT`).text(),
-  //     ]
-      
-  //     console.log(forecast[0])
-  //   }, 1000)
-  // }, []);
 
   useEffect(() => {
     const interval = setInterval(() => {
       const now = new Date();
+      const day = now.getDate();
+      const dayOfWeek = now.getDay();
+      const monthNum = now.getMonth();
       const hours = now.getHours().toString().padStart(2, "0");
       const minutes = now.getMinutes().toString().padStart(2, "0");
+
       const hoursInt = parseInt(hours);
       const minutesInt = parseInt(minutes);
+
+      dayRef.current.textContent = `${weeks[dayOfWeek]}, ${day} de ${months[monthNum]}`;
 
       for (let offset = 0; offset <= 2; offset++) {
         if ((hoursInt + (offset + 1)) <= 23) {
@@ -190,7 +207,8 @@ export default function Home() {
           } else if (conditionsReported == "Limpo com vento") {
             dayImg.current.style.backgroundImage  = `url("Parcial. nublado.jpg")`;
           }
-          
+
+          nightImg.current.style.opacity = 0;
           dayImg.current.style.opacity = 1;
           
           mainIcon.current.src = "Sun.svg";
@@ -293,8 +311,8 @@ export default function Home() {
           <div className={styles.timeContainer}>
             <div className={styles.timeNow}>
               <div ref={hoursDiv} className={styles.hours}></div>
-
               <div ref={minutesDiv} className={styles.minutes}></div>
+              <div ref={dayRef} className={styles.dayInfo}>TEST</div>
             </div>
           </div>
           <div className={styles.infoCotainer}>
@@ -342,6 +360,7 @@ export default function Home() {
             </div>
           </div>
         </div>
+        <audio controls loop src="Ambient Sound.mp3"/>
       </body>
     </>
   );
