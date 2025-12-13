@@ -1,4 +1,5 @@
 import styles from "@/styles/Home.module.css";
+import { log } from "console";
 import { symlink } from "fs";
 import { useEffect, useRef, useState } from "react";
 
@@ -37,7 +38,7 @@ export default function Home() {
     "Pancadas de chuva",
     "Pancadas de chuva na região", 
     "Trovoada na região",
-    "Ambient Sound",
+    "Tempestade",
     "Chuva"
   ]
 
@@ -193,6 +194,7 @@ export default function Home() {
         changeBackground.current = true;
 
         if (hoursInt >= parseInt(sunriseHours) && hoursInt < sunsetHours) {
+          console.log(conditionsReported)
           for (let x = 0; x < conditions.length; x++) { 
             if (conditionsReported == conditions[x]) {
               dayImg.current.style.backgroundImage  = `url("Chuva.jpg")`;
