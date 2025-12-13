@@ -36,6 +36,7 @@ export default function Home() {
     "Chuva fraca",
     "Pancadas de chuva",
     "Pancadas de chuva na região", 
+    "Trovoada na região",
     "Chuva"
   ]
 
