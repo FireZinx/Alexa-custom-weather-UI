@@ -37,6 +37,7 @@ export default function Home() {
     "Pancadas de chuva",
     "Pancadas de chuva na região", 
     "Trovoada na região",
+    "Ambient Sound",
     "Chuva"
   ]
 
