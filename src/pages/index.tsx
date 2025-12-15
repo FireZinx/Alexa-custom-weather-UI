@@ -167,7 +167,7 @@ export default function Home() {
       moonImgRef.current.src = `${moonStateDiv}.svg`;
     }, 1000)
 
-    delay.current = 1000;
+    delay.current = 60000;
     return () => clearInterval(interval);
   }, []);
 
