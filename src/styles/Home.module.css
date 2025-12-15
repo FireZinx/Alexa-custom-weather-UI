@@ -274,9 +274,27 @@
 
 .moonContainer {
     display: flex;
-    width: 10rem;
-    height: 10rem;
+    flex-direction: column;
+    align-items: center;
+    width: 11.31rem;
+    height: 12rem;
     border-radius: 1.4rem;
     background-color: rgba(54, 54, 54, 0.144);
     backdrop-filter: blur(1rem);
+    padding: 1.3rem;
+    gap: 1rem;
+}
+
+.moonPhase {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    width: 100%;
+}
+
+.moonFont {
+    font-family: "geologica";
+    font-size: 20px;
+    font-weight: 250;
 }

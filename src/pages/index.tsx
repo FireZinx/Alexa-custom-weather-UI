@@ -15,6 +15,8 @@ export default function Home() {
   const thermalRef = useRef(null);
   const mainIcon = useRef(null);
   const changeNews = useRef(null);
+  const moonImgRef = useRef(null);
+  const moonPhaseFontRef = useRef(null);
   const activeNews = useRef(0);
   const delay = useRef(1000);
 
@@ -144,6 +146,7 @@ export default function Home() {
       const humidityDiv = $(`div [data-testid="wxData"]`).eq(2).text().trim();
       const thermalDiv = $(`.TodayDetailsCard--feelsLikeTempValue--8WgHV`).text();
       const sunTimeDiv = $(`.TwcSunChart--dateValue--TzXBr`).text();
+      const moonStateDiv = $(`div [data-testid="wxData"]`).eq(7).text().trim();
 
       const [high, low] = maxMinTempDiv.split("/");
 
@@ -152,16 +155,19 @@ export default function Home() {
       sunrise = timeSplit[0];
       sunset = timeSplit[1];
 
+      console.log(moonStateDiv)
+
       mainTempRef.current.textContent = mainTempDiv;
       conditionsRef.current.textContent = conditionsDiv;
       maxTempRef.current.textContent = high;
       minTempRef.current.textContent = low;
       humidityRef.current.textContent = humidityDiv;
       thermalRef.current.textContent = `Sensação térmica de ${thermalDiv}`;
+      moonPhaseFontRef.current.textContent = moonStateDiv;
+      moonImgRef.current.src = `${moonStateDiv}.svg`;
+    }, 1000)
 
-    }, 15000)
-
-    delay.current = 60000;
+    delay.current = 1000;
     return () => clearInterval(interval);
   }, []);
 
@@ -226,7 +232,7 @@ export default function Home() {
 
       hoursDiv.current.textContent = hours;
       minutesDiv.current.textContent = minutes;
-    }, 1000);
+    }, 15000);
 
     return () => clearInterval(interval);
   }, []);
@@ -356,15 +362,12 @@ export default function Home() {
             </div>
             <div className={styles.moonContainer}>
               <div className={styles.moonPhase}>
-
+                <img style={{height:"6.6rem", width:"6.6rem"}} ref={moonImgRef}/>
               </div>
-              <div className={styles.moonFont}>
-
-              </div>
+              <div ref={moonPhaseFontRef} className={styles.moonFont}/>
             </div>
           </div>
         </div>
-        <audio controls loop src="Ambient Sound.mp3"/>
       </body>
     </>
   );
