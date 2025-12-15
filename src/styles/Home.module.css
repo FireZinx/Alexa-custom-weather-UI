@@ -276,13 +276,13 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 11.31rem;
-    height: 12rem;
+    width: 10.4rem;
+    height: 10rem;
     border-radius: 1.4rem;
-    background-color: rgba(54, 54, 54, 0.144);
+    background-color: rgba(12, 12, 12, 0.151);
     backdrop-filter: blur(1rem);
-    padding: 1.3rem;
-    gap: 1rem;
+    padding: 1rem;
+    gap: 0.5rem;
 }
 
 .moonPhase {
@@ -295,6 +295,8 @@
 
 .moonFont {
     font-family: "geologica";
-    font-size: 20px;
-    font-weight: 250;
+    font-size: 1.25rem;
+    font-weight: 350;
+    letter-spacing: -0.05rem;
+    color: white;
 }

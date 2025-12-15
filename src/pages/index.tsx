@@ -362,7 +362,7 @@ export default function Home() {
             </div>
             <div className={styles.moonContainer}>
               <div className={styles.moonPhase}>
-                <img style={{height:"6.6rem", width:"6.6rem"}} ref={moonImgRef}/>
+                <img style={{height:"5.7rem", width:"5.7rem"}} ref={moonImgRef}/>
               </div>
               <div ref={moonPhaseFontRef} className={styles.moonFont}/>
             </div>
