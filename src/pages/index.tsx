@@ -18,7 +18,7 @@ export default function Home() {
   const moonImgRef = useRef(null);
   const moonPhaseFontRef = useRef(null);
   const activeNews = useRef(0);
-  const delay = useRef(1000);
+  const delay = useRef(10000);
 
   const changeBackground = useRef(true);
 
@@ -165,7 +165,7 @@ export default function Home() {
       thermalRef.current.textContent = `Sensação térmica de ${thermalDiv}`;
       moonPhaseFontRef.current.textContent = moonStateDiv;
       moonImgRef.current.src = `${moonStateDiv}.svg`;
-    }, 1000)
+    }, 15000)
 
     delay.current = 60000;
     return () => clearInterval(interval);
