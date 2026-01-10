@@ -1,37 +1,39 @@
 import styles from "@/styles/Home.module.css";
-import { log } from "console";
+import { log, time } from "console";
 import { symlink } from "fs";
+import { convertSegmentPathToStaticExportFilename } from "next/dist/shared/lib/segment-cache/segment-value-encoding";
+import React from "react";
 import { useEffect, useRef, useState } from "react";
 
 export default function Home() {
   const axios = require('axios');
   const cheerio = require('cheerio');
 
-  const mainTempRef = useRef(null);
-  const conditionsRef = useRef(null);
-  const maxTempRef = useRef(null);
-  const minTempRef = useRef(null);
-  const humidityRef = useRef(null);
-  const thermalRef = useRef(null);
-  const mainIcon = useRef(null);
-  const changeNews = useRef(null);
-  const moonImgRef = useRef(null);
-  const moonPhaseFontRef = useRef(null);
-  const activeNews = useRef(0);
-  const delay = useRef(10000);
+  const mainTempRef = useRef<HTMLInputElement | null>(null);
+  const conditionsRef = useRef<HTMLInputElement | null>(null);
+  const maxTempRef = useRef<HTMLInputElement | null>(null);
+  const minTempRef = useRef<HTMLInputElement | null>(null);
+  const humidityRef = useRef<HTMLInputElement | null>(null);
+  const thermalRef = useRef<HTMLInputElement | null>(null);
+  const mainIcon = useRef<HTMLImageElement | null>(null);
+  const changeNews = useRef<HTMLInputElement | null>(null);
+  const moonImgRef = useRef<HTMLImageElement | null>(null);
+  const moonPhaseFontRef = useRef<HTMLInputElement | null>(null);
+  const activeNews = useRef<number>(0);
+  const delay = useRef<number>(0);
 
   const changeBackground = useRef(true);
 
   let news = [
-    {ref: useRef(null), iconRef: useRef(null), tittleRef: useRef(null), arrowRef: useRef(null), id:"Ethereum", oldValue: 0, url: "https://api.binance.com/api/v3/ticker/price?symbol=ETHUSDT", icon: "Ethereum.svg"},
-    {ref: useRef(null), iconRef: useRef(null), tittleRef: useRef(null), arrowRef: useRef(null), id:"Litecoin", oldValue: 0, url: "https://api.binance.com/api/v3/ticker/price?symbol=LTCUSDT", icon: "Litecoin.svg"},
-    {ref: useRef(null), iconRef: useRef(null), tittleRef: useRef(null), arrowRef: useRef(null), id:"INTC", oldValue: 0, url: "/api/hello", icon: "Intel.svg"},
+    {ref: React.createRef<HTMLDivElement>(), iconRef: useRef<HTMLImageElement | null>(null), tittleRef: useRef<HTMLInputElement | null>(null), arrowRef: useRef<HTMLImageElement | null>(null), id:"Ethereum", oldValue: useRef<number>(0), url: "https://api.binance.com/api/v3/ticker/price?symbol=ETHUSDT", icon: "Ethereum.svg"},
+    {ref: React.createRef<HTMLDivElement>(), iconRef: useRef<HTMLImageElement | null>(null), tittleRef: useRef<HTMLInputElement | null>(null), arrowRef: useRef<HTMLImageElement | null>(null), id:"Litecoin", oldValue: useRef<number>(0), url: "https://api.binance.com/api/v3/ticker/price?symbol=LTCUSDT", icon: "Litecoin.svg"},
+    {ref: React.createRef<HTMLDivElement>(), iconRef: useRef<HTMLImageElement | null>(null), tittleRef: useRef<HTMLInputElement | null>(null), arrowRef: useRef<HTMLImageElement | null>(null), id:"INTC", oldValue: useRef<number>(0), url: "/api/hello", icon: "Intel.svg"},
   ]
   
   let forecastList = [
-    {time: useRef(null), temp: 0, condition: null},
-    {time: useRef(null), temp: 0, condition: null},
-    {time: useRef(null), temp: 0, condition: null}
+    {time: useRef<HTMLInputElement | null>(null), temp: 0, condition: 0},
+    {time: useRef<HTMLInputElement | null>(null), temp: 0, condition: 0},
+    {time: useRef<HTMLInputElement | null>(null), temp: 0, condition: 0}
   ]
 
   let conditions = [
@@ -41,6 +43,7 @@ export default function Home() {
     "Pancadas de chuva na região", 
     "Trovoada na região",
     "Tempestade",
+    "Trovoada à noite",
     "Chuva"
   ]
 
@@ -69,17 +72,17 @@ export default function Home() {
     "dezembro"
   ]
 
-  const hoursDiv = useRef(null);
-  const minutesDiv = useRef(null);
-  const dayRef = useRef(null);
+  const hoursDiv = useRef<HTMLInputElement | null>(null);
+  const minutesDiv = useRef<HTMLInputElement | null>(null);
+  const dayRef = useRef<HTMLInputElement | null>(null);
 
-  let sunrise = null;
-  let sunset = null;
+  const sunrise = useRef<HTMLInputElement | null>(null);
+  const sunset = useRef<HTMLInputElement | null>(null);
 
-  const morningImg = useRef(null);
-  const dayImg = useRef(null);
-  const sunsetImg = useRef(null);
-  const nightImg = useRef(null);
+  const morningImg = useRef<HTMLInputElement | null>(null);
+  const dayImg = useRef<HTMLInputElement | null>(null);
+  const sunsetImg = useRef<HTMLInputElement | null>(null);
+  const nightImg = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -95,35 +98,35 @@ export default function Home() {
   const newsUpdate = useEffect(() => {
     for (let x = 0; x < news.length; x++) {
       const interval = setInterval( async () => {
-        let value;
         const response = await fetch(news[x].url)
         const data = await response.json();
-        value = (Math.round(data.price * 100) / 100).toFixed(2);
+        const value = parseInt((Math.round(data.price * 100) / 100).toFixed(2));
+        
+        news[x].tittleRef.current!.textContent = news[x].id
+        news[x].ref.current!.textContent = String(value);
+        news[x].iconRef.current!.src = news[x].icon
 
-        news[x].tittleRef.current.textContent = news[x].id
-        news[x].ref.current.textContent =  value;
-        news[x].iconRef.current.src = news[x].icon
-
-        if (value < news[x].oldValue) {
-          news[x].ref.current.style.color = "rgb(255, 0, 0)"
-          news[x].arrowRef.current.src = "Down.svg";
-          news[x].arrowRef.current.style.top = "1.6rem";
+        if (value < news[x].oldValue.current) {
+          news[x].ref.current!.style.color = "rgb(255, 0, 0)"
+          news[x].arrowRef.current!.src = "Down.svg";
+          news[x].arrowRef.current!.style.top = "1.6rem";
 
         } else {
-          news[x].ref.current.style.color = "rgb(0, 255, 0)"
-          news[x].arrowRef.current.src = "Up.svg";
-          news[x].arrowRef.current.style.top = "1.4rem";
+          news[x].ref.current!.style.color = "rgb(0, 255, 0)"
+          news[x].arrowRef.current!.src = "Up.svg";
+          news[x].arrowRef.current!.style.top = "1.4rem";
         }
-        news[x].oldValue = value;
+
+        news[x].oldValue.current = value;
       }, 1500 );
     } 
   }, [])
 
   const newsSwap = useEffect(() => {
     const interval = setInterval(() => {
-      changeNews.current.style.right = `${activeNews.current * 16.4}rem`
+      changeNews.current!.style.right = `${activeNews.current * 16.4}rem`
 
-      console.log(changeNews.current.style.right)
+      console.log(changeNews.current!.style.right)
 
       activeNews.current++;
 
@@ -137,7 +140,7 @@ export default function Home() {
   useEffect(() => {
     const interval = setInterval(async () => {
       const { data } = await axios.get('https://weather.com/pt-BR/clima/hoje/l/8aba151d4d4c4def3207394a113181d59312d242ad3c12c88bdf347d2c4580f4'); 
-      
+
       const $ = cheerio.load(data);
 
       const mainTempDiv = $('.CurrentConditions--tempValue--zUBSz').text();
@@ -152,22 +155,21 @@ export default function Home() {
 
       const timeSplit = sunTimeDiv.split(/(?<=\d{1,2}:\d{2})/);
 
-      sunrise = timeSplit[0];
-      sunset = timeSplit[1];
+      if (timeSplit && sunrise.current && sunset.current) {
+        sunrise.current.value = timeSplit[0];
+        sunset.current.value = timeSplit[1];
+      }
 
-      console.log(moonStateDiv)
+      mainTempRef.current!.textContent = mainTempDiv;
+      conditionsRef.current!.textContent = conditionsDiv;
+      maxTempRef.current!.textContent = high;
+      minTempRef.current!.textContent = low;
+      humidityRef.current!.textContent = humidityDiv;
+      thermalRef.current!.textContent = `Sensação térmica de ${thermalDiv}`;
+      moonPhaseFontRef.current!.textContent = moonStateDiv;
+      moonImgRef.current!.src = `${moonStateDiv}.svg`;
+    }, 1000)
 
-      mainTempRef.current.textContent = mainTempDiv;
-      conditionsRef.current.textContent = conditionsDiv;
-      maxTempRef.current.textContent = high;
-      minTempRef.current.textContent = low;
-      humidityRef.current.textContent = humidityDiv;
-      thermalRef.current.textContent = `Sensação térmica de ${thermalDiv}`;
-      moonPhaseFontRef.current.textContent = moonStateDiv;
-      moonImgRef.current.src = `${moonStateDiv}.svg`;
-    }, 15000)
-
-    delay.current = 60000;
     return () => clearInterval(interval);
   }, []);
 
@@ -183,56 +185,56 @@ export default function Home() {
       const hoursInt = parseInt(hours);
       const minutesInt = parseInt(minutes);
 
-      dayRef.current.textContent = `${weeks[dayOfWeek]}, ${day} de ${months[monthNum]}`;
+      dayRef.current!.textContent = `${weeks[dayOfWeek]}, ${day} de ${months[monthNum]}`;
 
       for (let offset = 0; offset <= 2; offset++) {
         if ((hoursInt + (offset + 1)) <= 23) {
-          forecastList[offset].time.current.textContent = `${hoursInt + (offset + 1)}:00`;
+          forecastList[offset].time.current!.textContent = `${hoursInt + (offset + 1)}:00`;
         } else {
-          forecastList[offset].time.current.textContent = `${(hoursInt + (offset + 1)) - 24}:00`;
+          forecastList[offset].time.current!.textContent = `${(hoursInt + (offset + 1)) - 24}:00`;
         }
       }
 
-      if (sunrise != null && sunset != null) { 
-        const [sunriseHours, sunriseMinutes] = sunrise.split(":");
-        const [sunsetHours, sunsetMinutes] = sunset.split(":");
-        const conditionsReported = conditionsRef.current.textContent;
+      if (sunrise.current?.value != null && sunrise.current?.value != null) {   
+        const [sunriseHours, sunriseMinutes] = sunrise.current!.value.split(":");
+        const [sunsetHours, sunsetMinutes] = sunrise.current!.value.split(":");
+        const conditionsReported = conditionsRef.current!.textContent;
         changeBackground.current = true;
 
-        if (hoursInt >= parseInt(sunriseHours) && hoursInt < sunsetHours) {
+        if (hoursInt >= parseInt(sunriseHours) && hoursInt < parseInt(sunsetHours)) {
           console.log(conditionsReported)
           for (let x = 0; x < conditions.length; x++) { 
             if (conditionsReported == conditions[x]) {
-              dayImg.current.style.backgroundImage  = `url("Chuva.jpg")`;
+              dayImg.current!.style.backgroundImage  = `url("Chuva.jpg")`;
               changeBackground.current = false;
             }
           }
 
           if (changeBackground.current == true) {
-            dayImg.current.style.backgroundImage  = `url("${conditionsReported}.jpg")`;
+            dayImg.current!.style.backgroundImage  = `url("${conditionsReported}.jpg")`;
           } 
           
           if (conditionsReported == "Nublado") {
-            dayImg.current.style.backgroundImage  = `url("Encoberto.jpg")`;
+            dayImg.current!.style.backgroundImage  = `url("Encoberto.jpg")`;
           } else if (conditionsReported == "Limpo com vento") {
-            dayImg.current.style.backgroundImage  = `url("Parcial. nublado.jpg")`;
+            dayImg.current!.style.backgroundImage  = `url("Parcial. nublado.jpg")`;
           }
 
-          nightImg.current.style.opacity = 0;
-          dayImg.current.style.opacity = 1;
+          nightImg.current!.style.opacity = "0";
+          dayImg.current!.style.opacity = "1";
           
-          mainIcon.current.src = "Sun.svg";
+          mainIcon.current!.src = "Sun.svg";
         } else {
-          nightImg.current.style.opacity = 1;
-          dayImg.current.style.opacity = 0;
+          nightImg.current!.style.opacity = "1";
+          dayImg.current!.style.opacity = "0";
           
-          mainIcon.current.src = "Moon.svg";
+          mainIcon.current!.src = "Moon.svg";
         }
       }
 
-      hoursDiv.current.textContent = hours;
-      minutesDiv.current.textContent = minutes;
-    }, 15000);
+      hoursDiv.current!.textContent = hours;
+      minutesDiv.current!.textContent = minutes;
+    }, 1000);
 
     return () => clearInterval(interval);
   }, []);
@@ -368,6 +370,8 @@ export default function Home() {
             </div>
           </div>
         </div>
+        <input type="hidden" ref={sunrise} />
+        <input type="hidden" ref={sunset} />
       </body>
     </>
   );

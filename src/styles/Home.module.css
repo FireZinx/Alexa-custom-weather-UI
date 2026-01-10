@@ -279,7 +279,7 @@
     width: 10.4rem;
     height: 10rem;
     border-radius: 1.4rem;
-    background-color: rgba(12, 12, 12, 0.151);
+    background-color: rgba(0, 0, 0, 0.164);
     backdrop-filter: blur(1rem);
     padding: 1rem;
     gap: 0.5rem;
@@ -295,8 +295,10 @@
 
 .moonFont {
     font-family: "geologica";
-    font-size: 1.25rem;
+    font-size: 1rem;
     font-weight: 350;
     letter-spacing: -0.05rem;
+    text-align: center;
     color: white;
+    width: 10rem;
 }
