@@ -16,6 +16,9 @@ export default function Home() {
   const humidityRef = useRef<HTMLInputElement | null>(null);
   const thermalRef = useRef<HTMLInputElement | null>(null);
   const mainIcon = useRef<HTMLImageElement | null>(null);
+  const infoContainer = useRef<HTMLImageElement | null>(null);
+  const newsContainer = useRef<HTMLImageElement | null>(null);
+  const exitButton = useRef<HTMLImageElement | null>(null);
   const changeNews = useRef<HTMLInputElement | null>(null);
   const moonImgRef = useRef<HTMLImageElement | null>(null);
   const moonPhaseFontRef = useRef<HTMLInputElement | null>(null);
@@ -23,11 +26,13 @@ export default function Home() {
   const delay = useRef<number>(0);
 
   const changeBackground = useRef(true);
+  const isChagingNews = useRef(true);
 
   let news = [
-    {ref: React.createRef<HTMLDivElement>(), iconRef: useRef<HTMLImageElement | null>(null), tittleRef: useRef<HTMLInputElement | null>(null), arrowRef: useRef<HTMLImageElement | null>(null), id:"Ethereum", oldValue: useRef<number>(0), url: "https://api.binance.com/api/v3/ticker/price?symbol=ETHUSDT", icon: "Ethereum.svg"},
-    {ref: React.createRef<HTMLDivElement>(), iconRef: useRef<HTMLImageElement | null>(null), tittleRef: useRef<HTMLInputElement | null>(null), arrowRef: useRef<HTMLImageElement | null>(null), id:"Litecoin", oldValue: useRef<number>(0), url: "https://api.binance.com/api/v3/ticker/price?symbol=LTCUSDT", icon: "Litecoin.svg"},
-    {ref: React.createRef<HTMLDivElement>(), iconRef: useRef<HTMLImageElement | null>(null), tittleRef: useRef<HTMLInputElement | null>(null), arrowRef: useRef<HTMLImageElement | null>(null), id:"INTC", oldValue: useRef<number>(0), url: "/api/hello", icon: "Intel.svg"},
+    {newsGap: React.createRef<HTMLDivElement>() ,parentRef: React.createRef<HTMLDivElement>(), ref: React.createRef<HTMLDivElement>(), iconRef: useRef<HTMLImageElement | null>(null), tittleRef: useRef<HTMLInputElement | null>(null), arrowRef: useRef<HTMLImageElement | null>(null), id:"Ethereum", oldValue: useRef<number>(0), url: "https://api.binance.com/api/v3/ticker/price?symbol=ETHUSDT", icon: "Ethereum.svg"},
+    {newsGap: React.createRef<HTMLDivElement>() ,parentRef: React.createRef<HTMLDivElement>(), ref: React.createRef<HTMLDivElement>(), iconRef: useRef<HTMLImageElement | null>(null), tittleRef: useRef<HTMLInputElement | null>(null), arrowRef: useRef<HTMLImageElement | null>(null), id:"Litecoin", oldValue: useRef<number>(0), url: "https://api.binance.com/api/v3/ticker/price?symbol=LTCUSDT", icon: "Litecoin.svg"},
+    {newsGap: React.createRef<HTMLDivElement>() ,parentRef: React.createRef<HTMLDivElement>(), ref: React.createRef<HTMLDivElement>(), iconRef: useRef<HTMLImageElement | null>(null), tittleRef: useRef<HTMLInputElement | null>(null), arrowRef: useRef<HTMLImageElement | null>(null), id:"INTC", oldValue: useRef<number>(0), url: "/api/hello", icon: "Intel.svg"},
+    {newsGap: React.createRef<HTMLDivElement>() ,parentRef: React.createRef<HTMLDivElement>(), ref: React.createRef<HTMLDivElement>(), iconRef: useRef<HTMLImageElement | null>(null), tittleRef: useRef<HTMLInputElement | null>(null), arrowRef: useRef<HTMLImageElement | null>(null), id:"AMD", oldValue: useRef<number>(0), url: "/api/hello", icon: "AMD.svg"},
   ]
   
   let forecastList = [
@@ -96,13 +101,28 @@ export default function Home() {
   }, [])
 
   const newsUpdate = useEffect(() => {
+    let data;
     for (let x = 0; x < news.length; x++) {
       const interval = setInterval( async () => {
-        const response = await fetch(news[x].url)
-        const data = await response.json();
-        const value = parseInt((Math.round(data.price * 100) / 100).toFixed(2));
+        if (news[x].url == "/api/hello") {
+          const response = await fetch(news[x].url, {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({id: news[x].id})
+          })
+
+          data = await response.json();
+        } else {
+          const response = await fetch(news[x].url);
+          data = await response.json();
+        }
+
+        const value = parseFloat((Math.round(data.price * 100) / 100).toFixed(2));
         
         news[x].tittleRef.current!.textContent = news[x].id
+        console.log(news[x].ref.current!)
         news[x].ref.current!.textContent = String(value);
         news[x].iconRef.current!.src = news[x].icon
 
@@ -117,6 +137,12 @@ export default function Home() {
           news[x].arrowRef.current!.style.top = "1.4rem";
         }
 
+        if (value < 43.64 && x == 2) {
+          hoursDiv.current!.style.backgroundColor = "rgba(255, 0, 0, 0.15)"
+        } else if (value > 43.64 && x == 2){
+          hoursDiv.current!.style.backgroundColor = "rgba(255, 255, 255, 0)"
+        }
+
         news[x].oldValue.current = value;
       }, 1500 );
     } 
@@ -124,14 +150,16 @@ export default function Home() {
 
   const newsSwap = useEffect(() => {
     const interval = setInterval(() => {
-      changeNews.current!.style.right = `${activeNews.current * 16.4}rem`
+      if (isChagingNews.current) {
+        changeNews.current!.style.right = `${activeNews.current * 16.4}rem`
 
-      console.log(changeNews.current!.style.right)
+        console.log(changeNews.current!.style.right)
 
-      activeNews.current++;
+        activeNews.current += 1;
 
-      if (activeNews.current > (news.length - 1)) {
-        activeNews.current = 0
+        if (activeNews.current > (news.length - 1)) {
+          activeNews.current = 0
+        }
       }
     }, 4000)
   });
@@ -168,7 +196,7 @@ export default function Home() {
       thermalRef.current!.textContent = `Sensação térmica de ${thermalDiv}`;
       moonPhaseFontRef.current!.textContent = moonStateDiv;
       moonImgRef.current!.src = `${moonStateDiv}.svg`;
-    }, 1000)
+    }, 20000)
 
     return () => clearInterval(interval);
   }, []);
@@ -187,21 +215,13 @@ export default function Home() {
 
       dayRef.current!.textContent = `${weeks[dayOfWeek]}, ${day} de ${months[monthNum]}`;
 
-      for (let offset = 0; offset <= 2; offset++) {
-        if ((hoursInt + (offset + 1)) <= 23) {
-          forecastList[offset].time.current!.textContent = `${hoursInt + (offset + 1)}:00`;
-        } else {
-          forecastList[offset].time.current!.textContent = `${(hoursInt + (offset + 1)) - 24}:00`;
-        }
-      }
-
       if (sunrise.current?.value != null && sunrise.current?.value != null) {   
         const [sunriseHours, sunriseMinutes] = sunrise.current!.value.split(":");
         const [sunsetHours, sunsetMinutes] = sunrise.current!.value.split(":");
         const conditionsReported = conditionsRef.current!.textContent;
         changeBackground.current = true;
 
-        if (hoursInt >= parseInt(sunriseHours) && hoursInt < parseInt(sunsetHours)) {
+        if (hoursInt >= 6 && hoursInt < 17) {
           console.log(conditionsReported)
           for (let x = 0; x < conditions.length; x++) { 
             if (conditionsReported == conditions[x]) {
@@ -239,6 +259,78 @@ export default function Home() {
     return () => clearInterval(interval);
   }, []);
 
+  const expandFinances = () =>{
+    if (isChagingNews.current) { 
+      isChagingNews.current = false
+
+      newsContainer.current!.style.transition = "1s, top 0s"
+
+      newsContainer.current!.style.position = "absolute"
+      newsContainer.current!.style.top = "2rem"
+      newsContainer.current!.style.right = "7.2rem"
+      newsContainer.current!.style.width = "45rem"
+      newsContainer.current!.style.height = "26rem"
+      newsContainer.current!.style.padding = "2rem"
+      newsContainer.current!.style.alignItems = "start"
+
+      changeNews.current!.style.right = "0rem"
+      changeNews.current!.style.flexDirection = "column"
+      changeNews.current!.style.gap = "2rem"
+
+      infoContainer.current!.style.paddingTop = "7.5rem"
+
+
+      for (let x = 0; x < news.length; x++) {
+        news[x].tittleRef.current!.style.fontSize = "1.5rem"
+
+        news[x].parentRef.current!.style.gap = "2rem"
+        news[x].parentRef.current!.style.flexDirection = "row"
+      }
+
+      setTimeout(() => {
+        exitButton.current!.style.opacity = "1"
+      }, 1500)
+
+    } else {
+      isChagingNews.current = true
+
+      newsContainer.current!.style.width = "15rem"
+      newsContainer.current!.style.height = "4rem"
+      newsContainer.current!.style.right = "1rem"
+
+      for (let x = 0; x < news.length; x++) {
+        news[x].newsGap.current!.style.opacity = "0"
+      }
+
+      setTimeout(() => {
+        newsContainer.current!.style.transition = "0s"
+        newsContainer.current!.style.position = "relative"
+        newsContainer.current!.style.right = "0rem"
+        newsContainer.current!.style.top = "0rem"
+        newsContainer.current!.style.padding = "0rem"
+        newsContainer.current!.style.alignItems = "center"
+
+        infoContainer.current!.style.paddingTop = "2rem"
+
+        changeNews.current!.style.flexDirection = "row"
+        changeNews.current!.style.gap = "5rem"
+
+        for (let x = 0; x < news.length; x++) {
+          news[x].tittleRef.current!.style.fontSize = "1rem"
+
+          news[x].parentRef.current!.style.gap = "0rem"
+          news[x].parentRef.current!.style.flexDirection = "column"
+
+          news[x].newsGap.current!.style.opacity = "1"
+        }
+
+      }, 1600)
+
+      exitButton.current!.style.opacity = "0"
+    }
+    console.log(isChagingNews.current)
+  }
+
   return (
     <>
       <body>
@@ -248,6 +340,11 @@ export default function Home() {
         <div ref={nightImg} className={styles.night}/>
         
         <div className={styles.main}>
+          <img ref={exitButton} src={"ArrowUp.svg"} className={styles.exitButton}
+          onClick={() => {
+            expandFinances();
+          }}
+          />
           <div className={styles.container}>
             <div className={styles.tempContainer}>
 
@@ -285,39 +382,6 @@ export default function Home() {
               </div>
 
               <div style={{height: "1rem"}}></div>
-
-              <div className={styles.forecastContainer}>
-                  <div className={styles.hoursContainer}>
-                      <div ref={forecastList[0].time} className={styles.hoursFont}>
-                          15:00
-                      </div>
-                      <div ref={forecastList[1].time} className={styles.hoursFont}>
-                          16:00
-                      </div>
-                      <div ref={forecastList[2].time} className={styles.hoursFont}>
-                          17:00
-                      </div>
-                  </div>
-
-                  <div className={styles.lineSeparate}></div>
-
-                  <div className={styles.forecastIcons}>
-                      <img style={{width: "26px", height: "26px"}} src="Sun.svg"></img>
-                      <img style={{width: "26px", height: "26px"}} src="Cloud.svg"></img>
-                      <img style={{width: "32px", height: "32px"}} src="Rain.svg"></img>
-                  </div>
-                  <div className={styles.forecastTemps}>
-                      <div className={styles.forecastFont}>
-                          15°
-                      </div>
-                      <div className={styles.forecastFont}>
-                          17°
-                      </div>
-                      <div className={styles.forecastFont}>
-                          18°
-                      </div>
-                  </div>
-              </div>
           </div>
 
           <div className={styles.timeContainer}>
@@ -327,39 +391,38 @@ export default function Home() {
               <div ref={dayRef} className={styles.dayInfo}>TEST</div>
             </div>
           </div>
-          <div className={styles.infoCotainer}>
-            <div className={styles.newsCotainer}>
-              <div ref={changeNews} className={styles.newsList}>
-                <div className={styles.newsGap}>
-                  <img style={{width: "3rem", height: "3rem"}} ref={news[0].iconRef} ></img>
-                  <div className={styles.valueQuotesContainer}>
-                    <span>
-                      <div ref={news[0].tittleRef} className={styles.newsTittle}></div>
-                      <div ref={news[0].ref} className={styles.newsFont}></div>
-                    </span>
-                    <img ref={news[0].arrowRef} style={{width: "1.2rem", height: "1.2rem", position: "relative", top: "1.4rem"}} ></img>
+          <div ref={infoContainer}className={styles.infoCotainer}>
+            <div ref={newsContainer} className={styles.newsCotainer}>
+              <div ref={changeNews} className={styles.newsList}
+              onClick={() => {
+                expandFinances();
+              }}
+              >
+                {news.map((item, index) => (
+                  <div key={index} ref={item.newsGap} className={styles.newsGap}>
+                    <img
+                      style={{ width: "3rem", height: "3rem" }}
+                      ref={item.iconRef}
+                    />
+
+                    <div className={styles.valueQuotesContainer}>
+                      <div ref={item.parentRef} className={styles.test}>
+                        <div ref={item.tittleRef} className={styles.newsTittle}></div>
+                        <div ref={item.ref} className={styles.newsFont}></div>
+                      </div>
+
+                      <img
+                        ref={item.arrowRef}
+                        style={{
+                          width: "1.2rem",
+                          height: "1.2rem",
+                          position: "relative",
+                          top: "1.4rem",
+                        }}
+                      />
+                    </div>
                   </div>
-                </div>
-                <div className={styles.newsGap}>
-                  <img style={{width: "3rem", height: "3rem"}} ref={news[1].iconRef} ></img>
-                  <div className={styles.valueQuotesContainer}>
-                    <span>
-                      <div ref={news[1].tittleRef} className={styles.newsTittle}></div>
-                      <div ref={news[1].ref} className={styles.newsFont}></div>
-                    </span>
-                    <img ref={news[1].arrowRef} style={{width: "1.2rem", height: "1.2rem", position: "relative", top: "1.4rem"}} ></img>
-                  </div>
-                </div>
-                <div className={styles.newsGap}>
-                  <img style={{width: "3rem", height: "3rem"}} ref={news[2].iconRef} ></img>
-                  <div className={styles.valueQuotesContainer}>
-                    <span>
-                      <div ref={news[2].tittleRef} className={styles.newsTittle}></div>
-                      <div ref={news[2].ref} className={styles.newsFont}></div>
-                    </span>
-                    <img ref={news[2].arrowRef} style={{width: "1.2rem", height: "1.2rem", position: "relative", top: "1.4rem"}} ></img>
-                  </div>
-                </div>
+                ))}
               </div>
             </div>
             <div className={styles.moonContainer}>

@@ -230,12 +230,13 @@
     justify-content: start;
     align-items: center;
     overflow: hidden;
-    left: 3.2rem;
     width: 15rem;
     height: 4rem;
     border-radius: 2rem;
+    z-index: 1;
     background-color: rgba(32, 32, 32, 0.137);
     backdrop-filter: blur(1rem);
+    transition: 2s, top 0s;
 }
 
 .newsList {
@@ -253,6 +254,7 @@
     align-items: center;
     justify-content: center;
     gap: 1rem;
+    transition: 0.2s;
 }
 
 .newsFont {
@@ -273,6 +275,7 @@
 }
 
 .moonContainer {
+    z-index: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -286,6 +289,7 @@
 }
 
 .moonPhase {
+    z-index: 0;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -294,6 +298,7 @@
 }
 
 .moonFont {
+    z-index: 0;
     font-family: "geologica";
     font-size: 1rem;
     font-weight: 350;
@@ -301,4 +306,25 @@
     text-align: center;
     color: white;
     width: 10rem;
+}
+
+.exitButton {
+    display: flex;
+    position: absolute;
+    background-color: transparent;
+    transform: rotate(90deg);
+    opacity: 0;
+    border: 0rem;
+    right: 10rem;
+    top: 4rem;
+    width: 2rem;
+    height: 2rem;
+    z-index: 2;
+    transition: opacity 0.6s;
+}
+
+.test {
+    display: flex;
+    flex-direction: column;
+    gap: 0rem;
 }
